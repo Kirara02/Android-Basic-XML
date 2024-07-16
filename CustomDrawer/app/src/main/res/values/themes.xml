@@ -1,0 +1,22 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.CustomDrawer" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:textColorPrimaryInverse">#FFF</item>
+        <item name="android:textColorSecondaryInverse">#AAA</item>
+
+        <item name="actionBarStyle">@style/DarkActionBar</item>
+
+        <item name="colorPrimary">#454D5E</item>
+        <item name="colorPrimaryDark">#2F3440</item>
+    </style>
+
+    <style name="DarkActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">
+        <item name="titleTextStyle">@style/DarkActionBarText</item>
+    </style>
+
+    <style name="DarkActionBarText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+</resources>
