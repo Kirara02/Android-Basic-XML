@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.kirara.customdrawer.R;
+import com.kirara.customdrawer.fragments.dialogs.AddDialog;
 
 public class HomeFragment extends Fragment {
 
@@ -40,7 +42,8 @@ public class HomeFragment extends Fragment {
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 int itemId = menuItem.getItemId();
                 if (itemId == R.id.home_add) {
-                    Toast.makeText(getContext(), "Add", Toast.LENGTH_LONG).show();
+                    AddDialog dialog = new AddDialog();
+                    dialog.show(getParentFragmentManager(), "dialog_add");
                     return true;
                 }
                 return false;
