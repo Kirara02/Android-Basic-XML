@@ -11,6 +11,7 @@ Repositori ini berisi contoh implementasi Custom Drawer menggunakan LinearLayout
     - [Custom Drawer dengan LinearLayout](#custom-drawer-dengan-linearlayout)
     - [Fragment ActionBar](#fragment-actionbar)
     - [Fragment Dialog](#fragment-dialog)
+    - [FCM and Notification](#fcm)
 - [Lisensi](#lisensi)
 
 ## Pendahuluan
@@ -22,6 +23,7 @@ Proyek ini bertujuan untuk menunjukkan bagaimana cara membuat navigasi yang rama
 - Implementasi Custom Drawer menggunakan LinearLayout.
 - Menambahkan tombol aksi pada ActionBar di Fragment.
 - Menampilkan dialog menggunakan DialogFragment.
+- Mengimplementasikan Notifikasi dengan FCM
 
 ## Instalasi
 
