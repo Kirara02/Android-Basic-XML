@@ -43,7 +43,7 @@ public class HomeFragment extends Fragment {
                 int itemId = menuItem.getItemId();
                 if (itemId == R.id.home_add) {
                     AddDialog dialog = new AddDialog();
-                    dialog.show(getParentFragmentManager(), "dialog_add");
+                    dialog.show(getChildFragmentManager(), "dialog_add");
                     return true;
                 }
                 return false;

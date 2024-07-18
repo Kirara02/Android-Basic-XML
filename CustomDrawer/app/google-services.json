@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "468775400341",
+    "project_id": "android-basic-13ac2",
+    "storage_bucket": "android-basic-13ac2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:468775400341:android:503f7390b640bea03f3c9c",
+        "android_client_info": {
+          "package_name": "com.kirara.customdrawer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfqD6iG8Xd_-yhiDSkKuinrOK1Yd3JnGY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,21 +1,31 @@
 package com.kirara.customdrawer;
 
+import android.Manifest;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.kirara.customdrawer.fragments.ArticleFragment;
 import com.kirara.customdrawer.fragments.GraphFragment;
 import com.kirara.customdrawer.fragments.HomeFragment;
@@ -23,6 +33,7 @@ import com.kirara.customdrawer.fragments.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity implements ListView.OnItemClickListener {
 
+    private static final int PERMISSIONS_REQUEST_POST_NOTIFICATIONS = 1;
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private DrawerAdapter drawerAdapter;
@@ -32,6 +43,23 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        requestPermission();
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(MainActivity.class.getName(), "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+                        // Get new FCM registration token
+                        String token = task.getResult();
+                        Log.w(MainActivity.class.getName(), token);
+                    }
+                });
+
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
@@ -65,6 +93,25 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
         }
 
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(grantResults.length == 0){
+            return;
+        }
+
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_POST_NOTIFICATIONS:
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                            Manifest.permission.POST_NOTIFICATIONS)) {
+                        Toast.makeText(MainActivity.this, "Toast shuha", Toast.LENGTH_LONG).show();
+                    }
+                }
+        }
     }
 
     @Override
@@ -129,5 +176,15 @@ public class MainActivity extends AppCompatActivity implements ListView.OnItemCl
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .commit();
         setTitle(drawerAdapter.getItemWithId(fragmentId).title);
+    }
+
+    private void requestPermission() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[] {Manifest.permission.POST_NOTIFICATIONS},
+                        PERMISSIONS_REQUEST_POST_NOTIFICATIONS);
+            }
+        }
     }
 }
