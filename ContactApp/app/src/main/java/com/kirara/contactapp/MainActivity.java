@@ -3,7 +3,9 @@ package com.kirara.contactapp;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -11,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        applyTheme();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -68,6 +75,13 @@ public class MainActivity extends AppCompatActivity {
         contactAdapter.setOnDeleteClickListener(this::showDeleteConfirmationDialog);
     }
 
+    private void applyTheme(){
+        SharedPreferences sharedPreferences = getSharedPreferences("theme_prefs", MODE_PRIVATE);
+        boolean isNightMode = sharedPreferences.getBoolean("night_mode", false);
+        AppCompatDelegate.setDefaultNightMode(
+                isNightMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -96,7 +110,26 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        MenuItem switchItem = menu.findItem(R.id.action_switch_theme);
+        SwitchCompat switchCompat = (SwitchCompat) switchItem.getActionView();
+        if (switchCompat != null) {
+            switchCompat.setChecked(isNightMode());
+            switchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                SharedPreferences.Editor editor = getSharedPreferences("theme_prefs", MODE_PRIVATE).edit();
+                editor.putBoolean("night_mode", isChecked);
+                editor.apply();
+                AppCompatDelegate.setDefaultNightMode(
+                        isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+                recreate();
+            });
+        }
+
         return true;
+    }
+
+    private boolean isNightMode() {
+        SharedPreferences sharedPreferences = getSharedPreferences("theme_prefs", MODE_PRIVATE);
+        return sharedPreferences.getBoolean("night_mode", false);
     }
 
     private void openAddContactDialog(@Nullable final ContactEntity contact, DialogType dialogType) {
