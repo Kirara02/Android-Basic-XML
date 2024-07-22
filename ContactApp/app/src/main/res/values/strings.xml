@@ -3,5 +3,8 @@
     <string name="add_contact">Add Contact</string>
     <string name="phone_number">Phone Number</string>
     <string name="name">Name</string>
-    <string name="delete_contact">Delete Contact</string>
+    <string name="more">More</string>
+    <string name="search">Search</string>
+    <string name="delete">Delete</string>
+    <string name="update">Update</string>
 </resources>
