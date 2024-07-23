@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+    <string name="refresh">Refresh</string>
+    <string name="description">Description</string>
+    <string name="temperature">Temperature</string>
+    <string name="humidity">Humidity</string>
+    <string name="pressure">Pressure</string>
+    <string name="wind_speed">Wind Speed</string>
+    <string name="visibility">Visibility</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="city">City</string>
+    <string name="search">Search</string>
+    <string name="switch_theme">Switch Theme</string>
+    <string name="sensor_temperature">Sensor Temperature</string>
+    <string name="sensor_humidity">Sensor Humidity</string>
+    <string name="sensor_pressure">Sensor Pressure</string>
+    <string name="forecast">Forecast</string>
+    <string name="kirara_bernstein">Kirara Bernstein</string>
+    <string name="created_by">Created By</string>
+</resources>
