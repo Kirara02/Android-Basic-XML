@@ -8,4 +8,19 @@
     <string name="delete">Delete</string>
     <string name="update">Update</string>
     <string name="switch_theme">Switch Theme</string>
+    <string name="themeSum">Change the look of the app.</string>
+    <string name="theme">Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="settings">Settings</string>
+    <string-array name="themeNames">
+        <item>@string/theme_light</item>
+        <item>@string/theme_dark</item>
+    </string-array>
+
+    <string-array
+        name="themeValues">
+        <item>lightDark</item>
+        <item>dark</item>
+    </string-array>
 </resources>

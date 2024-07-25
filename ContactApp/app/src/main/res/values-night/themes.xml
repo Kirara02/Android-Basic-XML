@@ -8,4 +8,12 @@
 
         <item name="iconColor">@color/white</item>
     </style>
+
+    <style name="AppTheme_Dark" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorAccent">@color/teal_200</item>
+        <item name="iconColor">@color/black</item>
+    </style>
 </resources>

@@ -1,5 +1,6 @@
 package com.kirara.contactapp;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,8 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,8 +46,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        applyTheme();
-
+//        applyTheme();
+        Settings.getInstance(this).applyTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -110,21 +113,30 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        MenuItem switchItem = menu.findItem(R.id.action_switch_theme);
-        SwitchCompat switchCompat = (SwitchCompat) switchItem.getActionView();
-        if (switchCompat != null) {
-            switchCompat.setChecked(isNightMode());
-            switchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                SharedPreferences.Editor editor = getSharedPreferences("theme_prefs", MODE_PRIVATE).edit();
-                editor.putBoolean("night_mode", isChecked);
-                editor.apply();
-                AppCompatDelegate.setDefaultNightMode(
-                        isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
-                recreate();
-            });
-        }
+//        MenuItem switchItem = menu.findItem(R.id.action_switch_theme);
+//        SwitchCompat switchCompat = (SwitchCompat) switchItem.getActionView();
+//        if (switchCompat != null) {
+//            switchCompat.setChecked(isNightMode());
+//            switchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
+//                SharedPreferences.Editor editor = getSharedPreferences("theme_prefs", MODE_PRIVATE).edit();
+//                editor.putBoolean("night_mode", isChecked);
+//                editor.apply();
+//                AppCompatDelegate.setDefaultNightMode(
+//                        isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+//                recreate();
+//            });
+//        }
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.action_settings){
+            startActivity(new Intent(this, Preference.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private boolean isNightMode() {

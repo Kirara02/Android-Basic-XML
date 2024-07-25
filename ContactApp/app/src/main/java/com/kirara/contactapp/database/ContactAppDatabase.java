@@ -14,17 +14,24 @@ import com.kirara.contactapp.database.entity.ContactEntity;
         entities = {
             ContactEntity.class
         },
-        version = 1
+        version = 1,
+        exportSchema = false
 )
 public abstract class ContactAppDatabase extends RoomDatabase {
-    private static ContactAppDatabase instance;
+    private static volatile ContactAppDatabase instance;
+
     public abstract ContactDao contactDao();
-    public static synchronized ContactAppDatabase getInstance(Context context){
-        if(instance == null){
-            instance = Room.databaseBuilder(context.getApplicationContext(),
-                    ContactAppDatabase.class, "contact_db")
-                    .fallbackToDestructiveMigration()
-                    .build();
+
+    public static ContactAppDatabase getInstance(Context context) {
+        if (instance == null) {
+            synchronized (ContactAppDatabase.class) {
+                if (instance == null) {
+                    instance = Room.databaseBuilder(context.getApplicationContext(),
+                                    ContactAppDatabase.class, "contact_db")
+                            .fallbackToDestructiveMigration() // Consider using migration in production
+                            .build();
+                }
+            }
         }
         return instance;
     }
