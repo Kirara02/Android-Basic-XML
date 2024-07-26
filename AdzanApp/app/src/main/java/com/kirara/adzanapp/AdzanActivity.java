@@ -16,6 +16,9 @@ import com.google.android.gms.location.LocationServices;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import android.util.Log;
 import android.widget.TextView;
@@ -27,12 +30,14 @@ import com.kirara.adzanapp.receiver.AdzanReceiver;
 import com.kirara.adzanapp.remote.AdzanApi;
 import com.kirara.adzanapp.remote.RetrofitClient;
 import com.kirara.adzanapp.util.SharedPreferencesHelper;
+import com.kirara.adzanapp.worker.FetchPrayerTimesWorker;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,9 +61,45 @@ public class AdzanActivity extends AppCompatActivity {
 
         createNotificationChannel();
 
+        scheduleDailyPrayerTimesFetch();
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         displayPrayerTimes();
         getDeviceLocation();
+    }
+
+    private void scheduleDailyPrayerTimesFetch() {
+        PeriodicWorkRequest prayerTimesFetchRequest =
+                new PeriodicWorkRequest.Builder(FetchPrayerTimesWorker.class, 1, TimeUnit.DAYS)
+                        .setInitialDelay(calculateInitialDelay(), TimeUnit.MILLISECONDS)
+                        .build();
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "PrayerTimesFetchWork",
+                ExistingPeriodicWorkPolicy.REPLACE,
+                prayerTimesFetchRequest
+        );
+    }
+
+    private long calculateInitialDelay() {
+        // Hitung delay awal agar pekerjaan berjalan tepat pada pukul 00:00
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+        Date now = new Date();
+        String targetTime = "00:00";
+        try {
+            Date targetDate = dateFormat.parse(targetTime);
+            targetDate.setDate(now.getDate());
+            targetDate.setMonth(now.getMonth());
+            targetDate.setYear(now.getYear());
+            if (now.after(targetDate)) {
+                // Tambahkan satu hari jika sekarang sudah lewat target waktu
+                targetDate.setDate(targetDate.getDate() + 1);
+            }
+            return targetDate.getTime() - now.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     private void getDeviceLocation() {
