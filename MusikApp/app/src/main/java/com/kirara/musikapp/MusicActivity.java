@@ -110,7 +110,7 @@ public class MusicActivity extends AppCompatActivity {
 
         listViewSongs.setOnItemClickListener((parent, view, position, id) -> {
             currentSongIndex = position;
-            playSong(songList.get(currentSongIndex).getFilePath());
+            onMusicClick(songList.get(currentSongIndex).getFilePath());
         });
 
         bindService(new Intent(this, MusicService.class), serviceConnection, BIND_AUTO_CREATE);
@@ -176,6 +176,14 @@ public class MusicActivity extends AppCompatActivity {
             }
         }
     }
+
+    private void onMusicClick(String filePath){
+        musicService.playMusic(filePath);
+        btnPlayPause.setImageResource(R.drawable.pause_circle_outline);
+        totalTime.setText(Formatters.formatTime(musicService.getSongDuration())); // Update total time
+        updateSeekBar();
+    }
+
 
     private void resumeSong() {
         if (isBound) {
