@@ -27,19 +27,22 @@ import com.kirara.musikapp.model.Song;
 import com.kirara.musikapp.util.Formatters;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class MusicActivity extends AppCompatActivity {
     private ListView listViewSongs;
-    private ImageButton btnPlayPause, btnNext, btnPrevious;
+    private ImageButton btnPlayPause, btnNext, btnPrevious, btnRepeat, btnShuffle;
     private SeekBar seekBar;
-    private TextView currentTime, totalTime;
+    private TextView currentTime, totalTime, currentTitle;
 
     private ArrayList<Song> songList;
     private int currentSongIndex = 0;
     private MusicService musicService;
     private boolean isBound = false;
+    private boolean isShuffle = false;
+    private boolean isRepeat = false;
 
     private Timer timer;
     private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -69,9 +72,12 @@ public class MusicActivity extends AppCompatActivity {
         btnPlayPause = findViewById(R.id.btnPlayPause);
         btnNext = findViewById(R.id.btnNext);
         btnPrevious = findViewById(R.id.btnPrevious);
+        btnRepeat = findViewById(R.id.btnRepeat);
+        btnShuffle = findViewById(R.id.btnShuffle);
         seekBar = findViewById(R.id.seekBar);
         currentTime = findViewById(R.id.tvCurrentTime);
         totalTime = findViewById(R.id.tvTotalTime);
+        currentTitle = findViewById(R.id.currentTitle);
 
         songList = new ArrayList<>();
 
@@ -108,8 +114,28 @@ public class MusicActivity extends AppCompatActivity {
 
         btnPrevious.setOnClickListener(v -> previousSong());
 
+        btnShuffle.setOnClickListener(v -> {
+            isShuffle = !isShuffle;
+            if (isShuffle) {
+                btnShuffle.setImageResource(R.drawable.ic_shuffle_on); // Change icon to shuffle on
+            } else {
+                btnShuffle.setImageResource(R.drawable.ic_shuffle); // Change icon to default
+            }
+        });
+
+        btnRepeat.setOnClickListener(v -> {
+            isRepeat = !isRepeat;
+            if (isRepeat) {
+                btnRepeat.setImageResource(R.drawable.ic_repeat_on); // Change icon to repeat on
+            } else {
+                btnRepeat.setImageResource(R.drawable.ic_repeat_white); // Change icon to default
+            }
+
+        });
+
         listViewSongs.setOnItemClickListener((parent, view, position, id) -> {
             currentSongIndex = position;
+            currentTitle.setText(songList.get(position).getTitle());
             onMusicClick(songList.get(currentSongIndex).getFilePath());
         });
 
@@ -169,6 +195,7 @@ public class MusicActivity extends AppCompatActivity {
                 musicService.pauseMusic();
                 btnPlayPause.setImageResource(R.drawable.play_circle_outline);
             } else {
+                currentTitle.setText(songList.get(currentSongIndex).getTitle());
                 musicService.playMusic(filePath);
                 btnPlayPause.setImageResource(R.drawable.pause_circle_outline);
                 totalTime.setText(Formatters.formatTime(musicService.getSongDuration())); // Update total time
@@ -202,7 +229,12 @@ public class MusicActivity extends AppCompatActivity {
     }
 
     private void nextSong() {
-        currentSongIndex = (currentSongIndex + 1) % songList.size();
+        if (isShuffle) {
+            currentSongIndex = new Random().nextInt(songList.size());
+        } else {
+            currentSongIndex = (currentSongIndex + 1) % songList.size();
+        }
+        currentTitle.setText(songList.get(currentSongIndex).getTitle());
         musicService.pauseMusic(); // Pause current song before starting next
         playSong(songList.get(currentSongIndex).getFilePath());
         seekBar.setProgress(0);
@@ -211,7 +243,12 @@ public class MusicActivity extends AppCompatActivity {
 
 
     private void previousSong() {
-        currentSongIndex = (currentSongIndex - 1 + songList.size()) % songList.size();
+        if (isShuffle) {
+            currentSongIndex = new Random().nextInt(songList.size());
+        } else {
+            currentSongIndex = (currentSongIndex - 1 + songList.size()) % songList.size();
+        }
+        currentTitle.setText(songList.get(currentSongIndex).getTitle());
         musicService.pauseMusic(); // Pause current song before starting previous
         playSong(songList.get(currentSongIndex).getFilePath());
         seekBar.setProgress(0);
@@ -245,6 +282,19 @@ public class MusicActivity extends AppCompatActivity {
                             int currentPos = musicService.getCurrentPosition();
                             seekBar.setProgress(currentPos);
                             currentTime.setText(Formatters.formatTime(currentPos));
+
+                            // Check if the song has ended
+                            if (currentPos >= musicService.getSongDuration() - 100) { // Small buffer to detect end
+                                if (isRepeat) {
+                                    musicService.seekTo(0);
+                                    currentTitle.setText(songList.get(currentSongIndex).getTitle());
+                                    musicService.playMusic(songList.get(currentSongIndex).getFilePath());
+                                    seekBar.setProgress(0);
+                                    currentTime.setText(Formatters.formatTime(0));
+                                } else {
+                                    nextSong();
+                                }
+                            }
                         }
                     });
                 }

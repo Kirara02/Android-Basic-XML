@@ -83,6 +83,7 @@ public class MusicService extends Service {
 
     public void seekTo(int position) {
         if (mediaPlayer != null) {
+            currentPosition = position;
             mediaPlayer.seekTo(position);
         }
     }
