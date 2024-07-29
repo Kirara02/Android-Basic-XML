@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +22,7 @@ import com.kirara.weatherapp.remote.WeatherApi;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,6 +30,7 @@ import retrofit2.Response;
 
 public class WeatherActivity extends AppCompatActivity {
     private static final int LOCATION_REQUEST_CODE = 1000;
+    private static final long API_UPDATE_INTERVAL = TimeUnit.MINUTES.toMillis(10); // 10 minutes
     private TextView place;
     private TextView clock;
     private TextView desc;
@@ -38,6 +42,7 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView wind;
     private TextView pressure;
     private TextView humidity;
+    private ProgressBar progressBar;
     private FusedLocationProviderClient fusedLocationClient;
     private final Handler handler = new Handler();
     private final Runnable updateClockRunnable = new Runnable() {
@@ -47,11 +52,19 @@ public class WeatherActivity extends AppCompatActivity {
             handler.postDelayed(this, 1000); // Update every second
         }
     };
+    private final Runnable apiUpdateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            getDeviceLocation();
+            handler.postDelayed(this, API_UPDATE_INTERVAL); // Update every 10 minutes
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
+        progressBar = findViewById(R.id.loader);
         place = findViewById(R.id.address);
         clock = findViewById(R.id.updated_at);
         desc = findViewById(R.id.status);
@@ -67,9 +80,18 @@ public class WeatherActivity extends AppCompatActivity {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         handler.post(updateClockRunnable);
-
+        handler.post(apiUpdateRunnable);
+        showProgressBar(true);
         getDeviceLocation();
 
+    }
+
+    private void showProgressBar(boolean show) {
+        if (show) {
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
     }
 
     private void updateClock() {
@@ -85,6 +107,7 @@ public class WeatherActivity extends AppCompatActivity {
         }
 
         fusedLocationClient.getLastLocation().addOnCompleteListener(this, task -> {
+            showProgressBar(false);
             if (task.isSuccessful() && task.getResult() != null) {
                 Location location = task.getResult();
                 getCurrentWeather(location.getLatitude(), location.getLongitude());
@@ -100,6 +123,7 @@ public class WeatherActivity extends AppCompatActivity {
         call.enqueue(new Callback<WeatherResponse>() {
             @Override
             public void onResponse(@NonNull Call<WeatherResponse> call, @NonNull Response<WeatherResponse> response) {
+                showProgressBar(false);
                 if (response.isSuccessful() && response.body() != null) {
                     WeatherResponse weatherResponse = response.body();
                     String cityName = weatherResponse.name;
@@ -159,5 +183,6 @@ public class WeatherActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(updateClockRunnable);
+        handler.removeCallbacks(apiUpdateRunnable);
     }
 }

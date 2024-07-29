@@ -344,4 +344,6 @@
         android:text="Something went wrong"
         android:visibility="gone" />
 
+
+
 </RelativeLayout>
