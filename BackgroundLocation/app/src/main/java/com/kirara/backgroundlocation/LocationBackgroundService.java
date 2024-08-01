@@ -185,7 +185,7 @@ import retrofit2.Response;
 public class LocationBackgroundService extends Service {
 
     private static final String CHANNEL_ID = "LocationServiceChannel";
-    private static final long TIMER_INTERVAL = 2 * 60 * 1000; // 2 minutes
+    private static final long TIMER_INTERVAL = 30 * 60 * 1000; // 2 minutes
     private static final long WAKELOCK_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
     private FusedLocationProviderClient fusedLocationClient;
